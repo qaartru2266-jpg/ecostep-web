@@ -3,203 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>青行 EcoStep - 低碳荣誉证书生成</title>
+    <title>青行 EcoStep - 低碳荣誉生成</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        /* --- 基础样式 --- */
+        /* --- 全局与海洋主题背景 --- */
         :root {
-            --primary-green: #2ecc71;
-            --dark-green: #27ae60;
-            --bg-color: #f0f9f4;
+            --ocean-top: #e0f7fa;
+            --ocean-bottom: #81d4fa;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --primary-blue: #0288d1;
+            --deep-sea: #01579b;
         }
 
         body {
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            background-color: var(--bg-color);
+            background: linear-gradient(180deg, var(--ocean-top) 0%, var(--ocean-bottom) 100%);
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            overflow-x: hidden; /* 防止鱼游出去产生横向滚动条 */
+        }
+
+        /* --- 装饰元素 (鱼、冰山) --- */
+        .decor-fish {
+            position: absolute;
+            width: 60px;
+            top: 10%;
+            left: -100px;
+            opacity: 0.8;
+            /* 让鱼游起来的动画 */
+            animation: swim 15s linear infinite;
+            pointer-events: none;
+            z-index: 0; 
+        }
+
+        @keyframes swim {
+            0% { left: -100px; transform: translateY(0); }
+            50% { transform: translateY(20px); }
+            100% { left: 110%; transform: translateY(-10px); }
+        }
+
+        .main-logo {
+            width: 120px; /* 根据你的 Logo 调整大小 */
+            margin-bottom: 10px;
+            z-index: 10;
         }
 
         h1 {
-            color: #2c3e50;
-            font-size: 1.5rem;
+            color: var(--deep-sea);
+            font-size: 1.6rem;
             margin-bottom: 20px;
             text-align: center;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+            z-index: 10;
         }
 
-        /* --- 输入区域样式 --- */
+        /* --- 输入卡片 (毛玻璃效果) --- */
         .input-card {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px); /* 毛玻璃核心 */
+            -webkit-backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
             width: 100%;
-            max-width: 350px;
+            max-width: 360px;
             margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            z-index: 10;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; color: var(--deep-sea); font-weight: bold; }
+        
         select, input {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #eee;
-            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid #b3e5fc;
+            border-radius: 10px;
             font-size: 1rem;
-            box-sizing: border-box; /* 确保内边距不撑大宽度 */
+            box-sizing: border-box;
+            background: rgba(255,255,255,0.9);
+            color: #333;
         }
 
         select:focus, input:focus {
-            border-color: var(--primary-green);
+            border-color: var(--primary-blue);
             outline: none;
+            box-shadow: 0 0 8px rgba(2, 136, 209, 0.3);
         }
 
         .btn-generate {
             width: 100%;
-            background-color: var(--primary-green);
+            background: linear-gradient(90deg, #29b6f6, #0288d1);
             color: white;
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 8px;
-            font-size: 1rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3);
         }
 
         .btn-generate:hover {
-            background-color: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(2, 136, 209, 0.4);
         }
 
-        /* --- 证书/徽章预览区域 (生成的图片样子) --- */
+        /* --- 证书/徽章预览区域 --- */
         #badge-container {
-            display: none; /* 默认隐藏，生成后显示 */
+            display: none;
             flex-direction: column;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 10px;
+            z-index: 10;
+            width: 100%;
+            max-width: 360px; /* 限制宽度，防止手机上溢出 */
         }
 
-        /* 这是证书的核心样式 - 就像画图一样 */
+        /* 证书本体样式 */
         .badge-card {
             width: 320px;
-            height: 480px;
-            background: linear-gradient(135deg, #e0f7fa 0%, #a5d6a7 100%);
+            height: 500px;
+            /* 证书背景：可以用图片，这里先用渐变模拟冰川 */
+            background: linear-gradient(160deg, #ffffff 0%, #e1f5fe 100%);
             border-radius: 20px;
-            padding: 30px;
+            padding: 0; /* 清空 padding，便于布局 */
             box-sizing: border-box;
             text-align: center;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: 8px solid white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 5px solid white;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            overflow: hidden; /* 裁剪掉溢出的图片 */
         }
 
-        /* 装饰用的圆圈 */
-        .badge-icon {
-            width: 100px;
-            height: 100px;
-            background: white;
-            border-radius: 50%;
-            margin: 0 auto;
+        /* 证书顶部的装饰 */
+        .badge-header {
+            background-color: #0288d1;
+            height: 80px;
+            border-radius: 15px 15px 100% 100% / 0px 0px 30px 30px; /* 弧形底边 */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .badge-title {
-            color: #1b5e20;
-            font-size: 24px;
+            color: white;
+            font-size: 20px;
             font-weight: bold;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .badge-content {
+            padding: 20px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
+            align-items: center;
+        }
+
+        .transport-icons {
+            display: flex;
             justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .t-icon {
+            font-size: 24px; /* 如果用Emoji */
+            /* 如果用图片：width: 40px; height: 40px; */
+            background: #e1f5fe;
+            padding: 8px;
+            border-radius: 50%;
         }
 
         .participant-name {
-            font-size: 32px;
-            color: #2e7d32;
-            font-weight: bold;
-            margin: 10px 0;
-            border-bottom: 2px dashed #81c784;
-            padding-bottom: 10px;
+            font-size: 34px;
+            color: #01579b;
+            font-weight: 800;
+            margin: 5px 0 15px 0;
+            letter-spacing: 2px;
         }
 
         .participant-id {
-            color: #555;
+            color: #fff;
+            background-color: #29b6f6;
+            padding: 4px 12px;
+            border-radius: 12px;
             font-size: 14px;
-            background: rgba(255,255,255,0.6);
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 0 auto;
+            margin-bottom: 20px;
         }
 
-        .badge-footer {
+        /* 底部冰山装饰 */
+        .badge-footer-img {
+            width: 100%;
+            margin-top: auto; /* 推到底部 */
+        }
+        
+        .footer-text {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            color: #546e7a;
             font-size: 12px;
-            color: #1b5e20;
-            opacity: 0.8;
-            margin-top: 20px;
+            text-align: center;
         }
 
-        .download-hint {
-            margin-top: 15px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
+        .download-hint { margin-top: 15px; color: #01579b; font-weight: bold;}
+        
         .btn-download {
-            background-color: #3498db;
-            color: white;
-            padding: 10px 25px;
+            background-color: #ffca28; /* 黄色醒目 */
+            color: #3e2723;
+            padding: 12px 30px;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             margin-top: 10px;
             cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* 加载动画 */
-        .loading {
-            display: none;
-            color: #666;
-            margin-top: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4);
+            margin-bottom: 40px; /* 留出底部空间 */
         }
 
     </style>
 </head>
 <body>
 
-    <h1>🌱 EcoStep 低碳荣誉生成</h1>
+    <div style="font-size:40px; margin-bottom:10px;">🌊</div> 
+    <h1>青行 EcoStep 荣誉生成</h1>
+
+    <img src="https://cdn-icons-png.flaticon.com/512/3065/3065780.png" class="decor-fish" style="top:15%; width:50px;">
+    <img src="https://cdn-icons-png.flaticon.com/512/3065/3065780.png" class="decor-fish" style="top:25%; animation-delay: 2s; width: 40px; opacity: 0.6;">
 
     <div class="input-card">
         <div class="form-group">
-            <label>🏅 参与编号 (必选)</label>
+            <label>🏅 参与编号</label>
             <select id="userId">
                 <option value="01">编号 01</option>
                 <option value="02">编号 02</option>
@@ -213,97 +253,97 @@
         </div>
 
         <div class="form-group">
-            <label>👤 小朋友姓名 (选填)</label>
-            <input type="text" id="userName" placeholder="例如：李明">
+            <label>👤 你的名字</label>
+            <input type="text" id="userName" placeholder="请输入名字">
         </div>
 
         <div class="form-group">
             <label>🔑 激活编码</label>
-            <input type="text" id="activeCode" placeholder="请输入老师给的编码">
+            <input type="text" id="activeCode" placeholder="老师给的编码">
         </div>
 
-        <button class="btn-generate" onclick="generateBadge()">生成我的低碳证书</button>
-        <div id="error-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; display: none;">编码错误，请重试！</div>
+        <button class="btn-generate" onclick="generateBadge()">生成证书</button>
+        <div id="error-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; display: none; text-align: center;">编码错误，请重试！</div>
     </div>
 
     <div id="badge-container">
         <div class="badge-card" id="capture-area">
-            <div>
-                <div class="badge-icon">🌿</div>
-                <div class="badge-title">低碳行动小卫士</div>
+            
+            <div class="badge-header">
+                低碳行动守护者
             </div>
             
             <div class="badge-content">
-                <div style="font-size: 14px; color: #555;">授予：</div>
-                <div class="participant-name" id="display-name">小朋友</div>
-                <div class="participant-id" id="display-id">ID: 01</div>
-                
-                <p style="font-size: 14px; color: #444; margin-top: 15px; line-height: 1.6;">
-                    感谢你参与 EcoStep 低碳出行计划。<br>
-                    你为地球减少了碳排放！
+                <div class="participant-name" id="display-name">李小明</div>
+                <span class="participant-id" id="display-id">NO.01</span>
+
+                <p style="color: #666; font-size: 14px; margin-top: 25px;">
+                    你在 EcoStep 计划中<br>成功解锁了以下低碳出行成就：
                 </p>
+
+                <div class="transport-icons">
+                    <div class="t-icon">🚶</div>
+                    <div class="t-icon">🚲</div>
+                    <div class="t-icon">🚌</div>
+                </div>
+
+                <div style="font-size: 13px; color: #888; margin-top: 10px; padding: 0 20px; line-height: 1.5;">
+                    感谢你为减少碳排放做出的贡献！<br>
+                    地球因为有你而更蓝。
+                </div>
             </div>
 
-            <div class="badge-footer">
-                EcoStep Project · 2026<br>
-                青行青少年低碳教育研究
+            <img src="https://cdn-icons-png.flaticon.com/512/2663/2663046.png" style="width: 100%; height: 120px; object-fit: cover; opacity: 0.8; margin-top:auto;">
+            
+            <div class="footer-text">
+                EcoStep Project 2026 · 青行计划
             </div>
         </div>
-        <div class="download-hint">预览生成成功！点击下方按钮保存</div>
-        <button class="btn-download" onclick="downloadImage()">⬇️ 保存证书图片</button>
+
+        <div class="download-hint">🎉 生成成功！快保存吧</div>
+        <button class="btn-download" onclick="downloadImage()">⬇️ 保存到相册</button>
     </div>
 
     <script>
-        // --- 配置区域 ---
         const CONFIG = {
-            // 这里就是你要改的密码，未来想改随时改这里
             SECRET_CODE: "1234abcd" 
         };
 
         function generateBadge() {
-            // 1. 获取输入
             const idInput = document.getElementById('userId').value;
             const nameInput = document.getElementById('userName').value.trim();
             const codeInput = document.getElementById('activeCode').value.trim();
             const errorMsg = document.getElementById('error-msg');
             const container = document.getElementById('badge-container');
 
-            // 2. 验证密码
             if (codeInput !== CONFIG.SECRET_CODE) {
                 errorMsg.style.display = 'block';
-                errorMsg.innerText = "❌ 激活编码错误，请找老师核对";
+                errorMsg.innerText = "❌ 激活编码错误";
                 container.style.display = 'none';
                 return;
             }
 
-            // 3. 验证通过，隐藏错误，显示证书
             errorMsg.style.display = 'none';
-            
-            // 4. 更新证书上的文字
-            document.getElementById('display-id').innerText = "ID: " + idInput;
-            
-            if (nameInput) {
-                document.getElementById('display-name').innerText = nameInput + " 同学";
-            } else {
-                document.getElementById('display-name').innerText = "环保小卫士"; // 如果没填名字的默认值
-            }
+            document.getElementById('display-id').innerText = "NO." + idInput;
+            document.getElementById('display-name').innerText = nameInput ? nameInput : "低碳卫士";
 
-            // 5. 显示区域
             container.style.display = 'flex';
             
-            // 6. 自动滚动到证书位置
-            container.scrollIntoView({ behavior: 'smooth' });
+            // 等待图片加载完再滚动，体验更好
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
         }
 
         function downloadImage() {
             const element = document.getElementById("capture-area");
             
-            // 使用 html2canvas 截图
+            // 为了保证截图清晰，临时放大容器
             html2canvas(element, {
-                scale: 2, // 提高清晰度
-                backgroundColor: null // 背景透明
+                scale: 3, // 更高清
+                useCORS: true, // 允许跨域图片(用了在线图片必须加这个)
+                backgroundColor: null
             }).then(canvas => {
-                // 创建下载链接
                 const link = document.createElement("a");
                 link.download = "EcoStep-低碳证书.png";
                 link.href = canvas.toDataURL("image/png");
