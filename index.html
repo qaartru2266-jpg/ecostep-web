@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青行 EcoStep - 低碳荣誉证书生成</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        /* --- 基础样式 --- */
+        :root {
+            --primary-green: #2ecc71;
+            --dark-green: #27ae60;
+            --bg-color: #f0f9f4;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* --- 输入区域样式 --- */
+        .input-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 350px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box; /* 确保内边距不撑大宽度 */
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary-green);
+            outline: none;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background-color: var(--primary-green);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-generate:hover {
+            background-color: var(--dark-green);
+        }
+
+        /* --- 证书/徽章预览区域 (生成的图片样子) --- */
+        #badge-container {
+            display: none; /* 默认隐藏，生成后显示 */
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        /* 这是证书的核心样式 - 就像画图一样 */
+        .badge-card {
+            width: 320px;
+            height: 480px;
+            background: linear-gradient(135deg, #e0f7fa 0%, #a5d6a7 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-sizing: border-box;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 8px solid white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* 装饰用的圆圈 */
+        .badge-icon {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .badge-title {
+            color: #1b5e20;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .badge-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .participant-name {
+            font-size: 32px;
+            color: #2e7d32;
+            font-weight: bold;
+            margin: 10px 0;
+            border-bottom: 2px dashed #81c784;
+            padding-bottom: 10px;
+        }
+
+        .participant-id {
+            color: #555;
+            font-size: 14px;
+            background: rgba(255,255,255,0.6);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0 auto;
+        }
+
+        .badge-footer {
+            font-size: 12px;
+            color: #1b5e20;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+
+        .download-hint {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .btn-download {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 25px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: none;
+            color: #666;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>🌱 EcoStep 低碳荣誉生成</h1>
+
+    <div class="input-card">
+        <div class="form-group">
+            <label>🏅 参与编号 (必选)</label>
+            <select id="userId">
+                <option value="01">编号 01</option>
+                <option value="02">编号 02</option>
+                <option value="03">编号 03</option>
+                <option value="04">编号 04</option>
+                <option value="05">编号 05</option>
+                <option value="06">编号 06</option>
+                <option value="07">编号 07</option>
+                <option value="08">编号 08</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>👤 小朋友姓名 (选填)</label>
+            <input type="text" id="userName" placeholder="例如：李明">
+        </div>
+
+        <div class="form-group">
+            <label>🔑 激活编码</label>
+            <input type="text" id="activeCode" placeholder="请输入老师给的编码">
+        </div>
+
+        <button class="btn-generate" onclick="generateBadge()">生成我的低碳证书</button>
+        <div id="error-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; display: none;">编码错误，请重试！</div>
+    </div>
+
+    <div id="badge-container">
+        <div class="badge-card" id="capture-area">
+            <div>
+                <div class="badge-icon">🌿</div>
+                <div class="badge-title">低碳行动小卫士</div>
+            </div>
+            
+            <div class="badge-content">
+                <div style="font-size: 14px; color: #555;">授予：</div>
+                <div class="participant-name" id="display-name">小朋友</div>
+                <div class="participant-id" id="display-id">ID: 01</div>
+                
+                <p style="font-size: 14px; color: #444; margin-top: 15px; line-height: 1.6;">
+                    感谢你参与 EcoStep 低碳出行计划。<br>
+                    你为地球减少了碳排放！
+                </p>
+            </div>
+
+            <div class="badge-footer">
+                EcoStep Project · 2026<br>
+                青行青少年低碳教育研究
+            </div>
+        </div>
+        <div class="download-hint">预览生成成功！点击下方按钮保存</div>
+        <button class="btn-download" onclick="downloadImage()">⬇️ 保存证书图片</button>
+    </div>
+
+    <script>
+        // --- 配置区域 ---
+        const CONFIG = {
+            // 这里就是你要改的密码，未来想改随时改这里
+            SECRET_CODE: "1234abcd" 
+        };
+
+        function generateBadge() {
+            // 1. 获取输入
+            const idInput = document.getElementById('userId').value;
+            const nameInput = document.getElementById('userName').value.trim();
+            const codeInput = document.getElementById('activeCode').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+            const container = document.getElementById('badge-container');
+
+            // 2. 验证密码
+            if (codeInput !== CONFIG.SECRET_CODE) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = "❌ 激活编码错误，请找老师核对";
+                container.style.display = 'none';
+                return;
+            }
+
+            // 3. 验证通过，隐藏错误，显示证书
+            errorMsg.style.display = 'none';
+            
+            // 4. 更新证书上的文字
+            document.getElementById('display-id').innerText = "ID: " + idInput;
+            
+            if (nameInput) {
+                document.getElementById('display-name').innerText = nameInput + " 同学";
+            } else {
+                document.getElementById('display-name').innerText = "环保小卫士"; // 如果没填名字的默认值
+            }
+
+            // 5. 显示区域
+            container.style.display = 'flex';
+            
+            // 6. 自动滚动到证书位置
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadImage() {
+            const element = document.getElementById("capture-area");
+            
+            // 使用 html2canvas 截图
+            html2canvas(element, {
+                scale: 2, // 提高清晰度
+                backgroundColor: null // 背景透明
+            }).then(canvas => {
+                // 创建下载链接
+                const link = document.createElement("a");
+                link.download = "EcoStep-低碳证书.png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
