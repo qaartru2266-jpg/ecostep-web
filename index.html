@@ -10,7 +10,7 @@
         :root {
             --ocean-top: #e0f7fa;
             --ocean-bottom: #81d4fa;
-            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg: rgba(255, 255, 255, 0.75); /*稍微透明一点，透出背景的鱼*/
             --primary-blue: #0288d1;
             --deep-sea: #01579b;
         }
@@ -24,32 +24,45 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden; /* 防止鱼游出去产生横向滚动条 */
+            overflow-x: hidden;
+            position: relative;
         }
 
-        /* --- 装饰元素 (鱼、冰山) --- */
-        .decor-fish {
-            position: absolute;
-            width: 60px;
-            top: 10%;
-            left: -100px;
-            opacity: 0.8;
-            /* 让鱼游起来的动画 */
-            animation: swim 15s linear infinite;
-            pointer-events: none;
+        /* --- 动态鱼群系统 --- */
+        .fish-container {
+            position: fixed; /* 固定在背景，不随页面滚动 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 让鼠标可以直接穿透鱼点击按钮 */
             z-index: 0; 
+            overflow: hidden;
+        }
+
+        .swimming-fish {
+            position: absolute;
+            opacity: 0.6;
+            animation: swim linear infinite;
         }
 
         @keyframes swim {
-            0% { left: -100px; transform: translateY(0); }
-            50% { transform: translateY(20px); }
-            100% { left: 110%; transform: translateY(-10px); }
+            from { transform: translateX(-200px) translateY(0); }
+            to { transform: translateX(100vw) translateY(20px); }
         }
 
+        /* --- 主界面样式 --- */
         .main-logo {
-            width: 120px; /* 根据你的 Logo 调整大小 */
+            width: 140px; 
             margin-bottom: 10px;
             z-index: 10;
+            /* 简单的浮动动画 */
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         h1 {
@@ -61,18 +74,18 @@
             z-index: 10;
         }
 
-        /* --- 输入卡片 (毛玻璃效果) --- */
+        /* --- 输入卡片 (毛玻璃) --- */
         .input-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(10px); /* 毛玻璃核心 */
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             padding: 25px;
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
             width: 100%;
             max-width: 360px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             z-index: 10;
         }
 
@@ -87,13 +100,6 @@
             font-size: 1rem;
             box-sizing: border-box;
             background: rgba(255,255,255,0.9);
-            color: #333;
-        }
-
-        select:focus, input:focus {
-            border-color: var(--primary-blue);
-            outline: none;
-            box-shadow: 0 0 8px rgba(2, 136, 209, 0.3);
         }
 
         .btn-generate {
@@ -106,16 +112,12 @@
             font-size: 1.1rem;
             cursor: pointer;
             font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
             box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3);
         }
+        .btn-generate:hover { transform: translateY(-2px); }
 
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(2, 136, 209, 0.4);
-        }
-
-        /* --- 证书/徽章预览区域 --- */
+        /* --- 证书样式 --- */
         #badge-container {
             display: none;
             flex-direction: column;
@@ -123,39 +125,32 @@
             margin-top: 10px;
             z-index: 10;
             width: 100%;
-            max-width: 360px; /* 限制宽度，防止手机上溢出 */
+            max-width: 360px;
         }
 
-        /* 证书本体样式 */
         .badge-card {
             width: 320px;
-            height: 500px;
-            /* 证书背景：可以用图片，这里先用渐变模拟冰川 */
-            background: linear-gradient(160deg, #ffffff 0%, #e1f5fe 100%);
+            height: 520px; /* 稍微加高一点以容纳冰山 */
+            background: linear-gradient(160deg, #ffffff 40%, #e1f5fe 100%);
             border-radius: 20px;
-            padding: 0; /* 清空 padding，便于布局 */
-            box-sizing: border-box;
-            text-align: center;
-            position: relative;
+            border: 6px solid white;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            border: 5px solid white;
+            position: relative;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 裁剪掉溢出的图片 */
+            overflow: hidden; 
         }
 
-        /* 证书顶部的装饰 */
         .badge-header {
             background-color: #0288d1;
-            height: 80px;
-            border-radius: 15px 15px 100% 100% / 0px 0px 30px 30px; /* 弧形底边 */
+            height: 70px;
+            border-radius: 14px 14px 100% 100% / 0px 0px 25px 25px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            margin-bottom: 20px;
         }
 
         .badge-content {
@@ -164,28 +159,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        .transport-icons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .t-icon {
-            font-size: 24px; /* 如果用Emoji */
-            /* 如果用图片：width: 40px; height: 40px; */
-            background: #e1f5fe;
-            padding: 8px;
-            border-radius: 50%;
+            z-index: 2; /* 确保文字在冰山图层之上 */
         }
 
         .participant-name {
-            font-size: 34px;
+            font-size: 32px;
             color: #01579b;
             font-weight: 800;
-            margin: 5px 0 15px 0;
-            letter-spacing: 2px;
+            margin: 10px 0;
         }
 
         .participant-id {
@@ -194,61 +175,67 @@
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 14px;
-            margin-bottom: 20px;
         }
 
-        /* 底部冰山装饰 */
-        .badge-footer-img {
+        /* 底部冰山图片 */
+        .footer-iceberg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            margin-top: auto; /* 推到底部 */
+            height: 180px; /* 控制冰山高度 */
+            object-fit: cover; /* 铺满底部 */
+            object-position: bottom;
+            z-index: 1;
+            opacity: 0.9;
         }
         
         .footer-text {
             position: absolute;
-            bottom: 15px;
+            bottom: 10px;
             width: 100%;
-            color: #546e7a;
+            color: #0d47a1; /* 深色字确保在冰山上能看清 */
             font-size: 12px;
             text-align: center;
+            z-index: 3;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
         }
 
-        .download-hint { margin-top: 15px; color: #01579b; font-weight: bold;}
-        
         .btn-download {
-            background-color: #ffca28; /* 黄色醒目 */
+            background-color: #ffca28;
             color: #3e2723;
             padding: 12px 30px;
             border: none;
             border-radius: 30px;
-            margin-top: 10px;
+            margin: 20px 0 40px 0;
             cursor: pointer;
             font-weight: bold;
             box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4);
-            margin-bottom: 40px; /* 留出底部空间 */
         }
 
     </style>
 </head>
 <body>
 
-    <div style="font-size:40px; margin-bottom:10px;">🌊</div> 
-    <h1>青行 EcoStep 荣誉生成</h1>
+    <div id="fish-tank" class="fish-container"></div>
 
-    <img src="https://cdn-icons-png.flaticon.com/512/3065/3065780.png" class="decor-fish" style="top:15%; width:50px;">
-    <img src="https://cdn-icons-png.flaticon.com/512/3065/3065780.png" class="decor-fish" style="top:25%; animation-delay: 2s; width: 40px; opacity: 0.6;">
+    <img src="assets/logo.png" alt="EcoStep Logo" class="main-logo" onerror="this.style.display='none';alert('Logo图片未找到，请检查assets文件夹');">
+    
+    <h1>青行 EcoStep 荣誉生成</h1>
 
     <div class="input-card">
         <div class="form-group">
             <label>🏅 参与编号</label>
             <select id="userId">
-                <option value="01">编号 01</option>
-                <option value="02">编号 02</option>
-                <option value="03">编号 03</option>
-                <option value="04">编号 04</option>
-                <option value="05">编号 05</option>
-                <option value="06">编号 06</option>
-                <option value="07">编号 07</option>
-                <option value="08">编号 08</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
             </select>
         </div>
 
@@ -263,7 +250,7 @@
         </div>
 
         <button class="btn-generate" onclick="generateBadge()">生成证书</button>
-        <div id="error-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; display: none; text-align: center;">编码错误，请重试！</div>
+        <div id="error-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; display: none; text-align: center;">编码错误</div>
     </div>
 
     <div id="badge-container">
@@ -277,37 +264,63 @@
                 <div class="participant-name" id="display-name">李小明</div>
                 <span class="participant-id" id="display-id">NO.01</span>
 
-                <p style="color: #666; font-size: 14px; margin-top: 25px;">
-                    你在 EcoStep 计划中<br>成功解锁了以下低碳出行成就：
+                <p style="color: #546e7a; font-size: 15px; margin-top: 30px; padding: 0 10px; line-height: 1.6;">
+                    感谢你参与 <b>EcoStep</b> 计划。<br>
+                    你的每一次低碳出行，<br>都在帮助冰川保持寒冷。
                 </p>
 
-                <div class="transport-icons">
-                    <div class="t-icon">🚶</div>
-                    <div class="t-icon">🚲</div>
-                    <div class="t-icon">🚌</div>
-                </div>
-
-                <div style="font-size: 13px; color: #888; margin-top: 10px; padding: 0 20px; line-height: 1.5;">
-                    感谢你为减少碳排放做出的贡献！<br>
-                    地球因为有你而更蓝。
-                </div>
             </div>
 
-            <img src="https://cdn-icons-png.flaticon.com/512/2663/2663046.png" style="width: 100%; height: 120px; object-fit: cover; opacity: 0.8; margin-top:auto;">
+            <img src="assets/iceberg.png" class="footer-iceberg" alt="iceberg">
             
             <div class="footer-text">
                 EcoStep Project 2026 · 青行计划
             </div>
         </div>
 
-        <div class="download-hint">🎉 生成成功！快保存吧</div>
+        <div style="margin-top:15px; color:#01579b;">🎉 生成成功！</div>
         <button class="btn-download" onclick="downloadImage()">⬇️ 保存到相册</button>
     </div>
 
     <script>
-        const CONFIG = {
-            SECRET_CODE: "1234abcd" 
-        };
+        // --- 1. 自动生成背景鱼群 ---
+        function initFishTank() {
+            const tank = document.getElementById('fish-tank');
+            const totalFishImages = 10; // 你有10条鱼
+            const fishCount = 6; // 屏幕上同时显示几条鱼（太多会乱）
+
+            for (let i = 0; i < fishCount; i++) {
+                const fish = document.createElement('img');
+                
+                // 随机选一张鱼的图片: assets/fish (1).png 到 fish (10).png
+                const randomImgIndex = Math.floor(Math.random() * totalFishImages) + 1;
+                fish.src = `assets/fish (${randomImgIndex}).png`;
+                
+                fish.classList.add('swimming-fish');
+                
+                // 随机大小
+                const size = 40 + Math.random() * 60; // 40px - 100px
+                fish.style.width = `${size}px`;
+                
+                // 随机起始位置（垂直方向）
+                fish.style.top = `${Math.random() * 90}%`;
+                
+                // 随机游动速度
+                const duration = 15 + Math.random() * 20; // 15s - 35s
+                fish.style.animationDuration = `${duration}s`;
+                
+                // 随机延迟，避免同时出来
+                fish.style.animationDelay = `-${Math.random() * 20}s`;
+
+                tank.appendChild(fish);
+            }
+        }
+
+        // 页面加载完就放鱼
+        window.onload = initFishTank;
+
+        // --- 2. 证书生成逻辑 ---
+        const CONFIG = { SECRET_CODE: "1234abcd" };
 
         function generateBadge() {
             const idInput = document.getElementById('userId').value;
@@ -328,20 +341,14 @@
             document.getElementById('display-name').innerText = nameInput ? nameInput : "低碳卫士";
 
             container.style.display = 'flex';
-            
-            // 等待图片加载完再滚动，体验更好
-            setTimeout(() => {
-                container.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
+            setTimeout(() => { container.scrollIntoView({ behavior: 'smooth' }); }, 100);
         }
 
         function downloadImage() {
             const element = document.getElementById("capture-area");
-            
-            // 为了保证截图清晰，临时放大容器
             html2canvas(element, {
-                scale: 3, // 更高清
-                useCORS: true, // 允许跨域图片(用了在线图片必须加这个)
+                scale: 3,
+                useCORS: true, 
                 backgroundColor: null
             }).then(canvas => {
                 const link = document.createElement("a");
