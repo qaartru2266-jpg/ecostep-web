@@ -50,7 +50,7 @@
 
         /* --- 主界面样式 --- */
         .main-logo { 
-            width: 280px; 
+            width: 200px; 
             margin-bottom: 10px; 
             z-index: 10;
             animation: float 3s ease-in-out infinite; 
@@ -218,19 +218,20 @@
                     <div class="ach-icon">🌿</div>
                     <div class="ach-text">
                         成功完成 <b>EcoStep</b> 挑战<br>
-                        相当于减少碳排放 <b>约 2.5kg</b>
+                        在挑战中共收集 <b>10</b>条鱼<br>
                     </div>
                 </div>
                 
                 <div class="divider-line"></div>
 
                 <p style="color: #0277bd; font-size: 14px; margin-top: 5px; padding: 0 20px; line-height: 1.6; text-align: center;">
-                    感谢你用行动守护蔚蓝星球。<br>
-                    你的每一步，都让冰川更安定。
+                    感谢你积极践行低碳出行理念<br>
+                    用行动守护我们的蔚蓝星球。<br>
                 </p>
 
                 <div class="footer-text">
                     EcoStep Project 2026 · 青行计划
+                    南方科技大学创新创意设计学院 · 韧性文化研究组
                 </div>
             </div>
             
@@ -246,7 +247,7 @@
         function initFishTank() {
             const tank = document.getElementById('fish-tank');
             const totalFishImages = 10; 
-            const fishCount = 7; // 稍微增加一条鱼
+            const fishCount = 20; // 同屏同时游动 20 条鱼
 
             for (let i = 0; i < fishCount; i++) {
                 const fish = document.createElement('img');
@@ -257,7 +258,7 @@
                 fish.classList.add('swimming-fish');
                 
                 // 随机大小
-                const size = 35 + Math.random() * 55;
+                const size = 20 + Math.random() * 120;
                 fish.style.width = `${size}px`;
                 
                 // 随机起始位置（垂直方向）
