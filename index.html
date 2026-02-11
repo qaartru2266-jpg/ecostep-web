@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +6,6 @@
     <title>青行 EcoStep - 低碳荣誉生成</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        /* --- 全局与海洋主题背景 --- */
         :root {
             --ocean-top: #e0f7fa;
             --ocean-bottom: #81d4fa;
@@ -29,11 +28,15 @@
             position: relative;
         }
 
-        /* --- 动态鱼群系统 --- */
         .fish-container {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0; overflow: hidden;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
         }
 
         .swimming-fish {
@@ -42,147 +45,206 @@
             animation: swim linear infinite;
         }
 
-        /* 🐟【修改点1】修改动画，加入 scaleX(-1) 让鱼掉头 */
         @keyframes swim {
             from { transform: translateX(-200px) scaleX(-1); }
             to { transform: translateX(100vw) scaleX(-1); }
         }
 
-        /* --- 主界面样式 --- */
-        .main-logo { 
-            width: 200px; 
-            margin-bottom: 10px; 
+        .main-logo {
+            width: 200px;
+            margin-bottom: 10px;
             z-index: 10;
-            animation: float 3s ease-in-out infinite; 
-        } 
-        
+            animation: float 3s ease-in-out infinite;
+        }
+
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
 
         h1 {
-            color: var(--deep-sea); font-size: 1.6rem; margin-bottom: 20px;
-            text-align: center; text-shadow: 0 2px 4px rgba(255,255,255,0.5); z-index: 10;
+            color: var(--deep-sea);
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+            z-index: 10;
         }
 
-        /* --- 输入卡片 --- */
         .input-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            padding: 25px; border-radius: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 20px;
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-            width: 100%; max-width: 360px; margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.6); z-index: 10;
+            width: 100%;
+            max-width: 360px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            z-index: 10;
         }
 
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 8px; color: var(--deep-sea); font-weight: bold; }
-        select, input {
-            width: 100%; padding: 12px; border: 2px solid #b3e5fc;
-            border-radius: 10px; font-size: 1rem; box-sizing: border-box;
-            background: rgba(255,255,255,0.9);
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--deep-sea);
+            font-weight: bold;
         }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #b3e5fc;
+            border-radius: 10px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
         .btn-generate {
-            width: 100%; background: linear-gradient(90deg, #29b6f6, #0288d1);
-            color: white; padding: 14px; border: none; border-radius: 12px;
-            font-size: 1.1rem; cursor: pointer; font-weight: bold;
-            transition: transform 0.2s; box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3);
+            width: 100%;
+            background: linear-gradient(90deg, #29b6f6, #0288d1);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3);
         }
+
         .btn-generate:hover { transform: translateY(-2px); }
 
-        /* --- ✨【修改点3】证书样式美化升级 --- */
         #badge-container {
-            display: none; flex-direction: column; align-items: center;
-            margin-top: 10px; z-index: 10; width: 100%; max-width: 360px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+            z-index: 10;
+            width: 100%;
+            max-width: 360px;
         }
 
         .badge-card {
             width: 320px;
-            /* 稍微调整了高度和背景渐变 */
-            height: 540px; 
+            height: 540px;
             background: linear-gradient(170deg, #ffffff 50%, #b3e5fc 100%);
             border-radius: 25px;
             border: 6px solid white;
             box-shadow: 0 20px 40px rgba(0, 47, 108, 0.25);
             position: relative;
-            display: flex; flex-direction: column; overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .badge-header {
             background: linear-gradient(90deg, #0288d1, #01579b);
             height: 75px;
-            border-radius: 18px 18px 100% 100% / 0px 0px 30px 30px;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 20px; font-weight: 800; letter-spacing: 1px;
+            border-radius: 18px 18px 100% 100% / 0 0 30px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
             box-shadow: 0 5px 15px rgba(2, 136, 209, 0.3);
         }
 
         .badge-content {
-            padding: 20px; flex-grow: 1; display: flex;
-            flex-direction: column; align-items: center; z-index: 2;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
         }
 
         .participant-name {
-            font-size: 36px; color: var(--deep-sea); font-weight: 900;
+            font-size: 36px;
+            color: var(--deep-sea);
+            font-weight: 900;
             margin: 15px 0 5px 0;
         }
 
         .participant-id {
-            color: var(--deep-sea); background-color: #b3e5fc;
-            padding: 4px 15px; border-radius: 20px; font-size: 14px; font-weight: bold;
+            color: var(--deep-sea);
+            background-color: #b3e5fc;
+            padding: 4px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
         }
 
-        /* 新增：成就展示块 */
         .achievement-block {
-            margin: 25px 0; padding: 15px;
+            margin: 25px 0;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 15px;
             border: 2px dashed #4fc3f7;
             width: 85%;
         }
+
         .ach-icon { font-size: 32px; }
         .ach-text { text-align: left; font-size: 13px; color: #0277bd; line-height: 1.4; }
         .ach-text b { color: #01579b; font-size: 15px; }
 
-        /* 新增：装饰分割线 */
         .divider-line {
-            height: 3px; width: 50%;
+            height: 3px;
+            width: 50%;
             background: linear-gradient(90deg, transparent, #4fc3f7, transparent);
-            margin-bottom: 15px; opacity: 0.6;
-        }
-        
-        .footer-text {
-            margin-top: auto; margin-bottom: 25px;
-            color: #546e7a; font-size: 12px; text-align: center;
+            margin-bottom: 15px;
+            opacity: 0.6;
         }
 
-        /* 🧊【修改点2】隐藏冰山，但保留类名以备后用 */
+        .footer-text {
+            margin-top: auto;
+            margin-bottom: 25px;
+            color: #546e7a;
+            font-size: 12px;
+            text-align: center;
+        }
+
         .footer-iceberg { display: none; }
 
         .btn-download {
             background: linear-gradient(90deg, var(--accent-yellow), #ffb300);
-            color: #5d4037; padding: 14px 35px; border: none; border-radius: 35px;
-            margin: 20px 0 50px 0; cursor: pointer; font-weight: 800; font-size: 1.1rem;
-            box-shadow: 0 6px 20px rgba(255, 179, 0, 0.4); transition: transform 0.2s;
+            color: #5d4037;
+            padding: 14px 35px;
+            border: none;
+            border-radius: 35px;
+            margin: 20px 0 50px 0;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 6px 20px rgba(255, 179, 0, 0.4);
+            transition: transform 0.2s;
         }
-        .btn-download:hover { transform: scale(1.05); }
 
+        .btn-download:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
-
     <div id="fish-tank" class="fish-container"></div>
 
     <img src="assets/logo.png" alt="EcoStep Logo" class="main-logo" onerror="this.style.display='none';">
-    
+
     <h1>青行 EcoStep 参与证书生成</h1>
 
     <div class="input-card">
         <div class="form-group">
-            <label>🏅 家庭编号</label>
+            <label>🏡 家庭编号</label>
             <select id="userId">
                 <option value="01">01</option>
                 <option value="02">02</option>
@@ -195,12 +257,12 @@
             </select>
         </div>
         <div class="form-group">
-            <label>👤 姓名</label>
-            <input type="text" id="userName" placeholder="请输入名字">
+            <label>😀 姓名</label>
+            <input type="text" id="userName" placeholder="请输入姓名">
         </div>
         <div class="form-group">
-            <label>🔑 激活编码</label>
-            <input type="text" id="activeCode" placeholder="老师给的编码">
+            <label>🔑 激活码</label>
+            <input type="text" id="activeCode" placeholder="请输入激活码">
         </div>
         <button class="btn-generate" onclick="generateBadge()">生成证书</button>
         <div id="error-msg" style="color: red; margin-top: 10px; font-size: 0.9rem; display: none; text-align: center;">编码错误</div>
@@ -209,19 +271,19 @@
     <div id="badge-container">
         <div class="badge-card" id="capture-area">
             <div class="badge-header">✨ 低碳未来体验官 ✨</div>
-            
+
             <div class="badge-content">
                 <div class="participant-name" id="display-name">李小明</div>
                 <span class="participant-id" id="display-id">NO.01</span>
 
                 <div class="achievement-block">
-                    <div class="ach-icon">🌿</div>
+                    <div class="ach-icon">🐠</div>
                     <div class="ach-text">
                         成功完成 <b>EcoStep</b> 挑战<br>
-                        在挑战中共收集 <b>10</b>条鱼<br>
+                        在挑战中共收集 <b id="display-fish-count">10</b> 条鱼<br>
                     </div>
                 </div>
-                
+
                 <div class="divider-line"></div>
 
                 <p style="color: #0277bd; font-size: 14px; margin-top: 5px; padding: 0 20px; line-height: 1.6; text-align: center;">
@@ -230,11 +292,11 @@
                 </p>
 
                 <div class="footer-text">
-                    EcoStep Project 2026 · 青行计划
+                    EcoStep Project 2026 · 青行计划<br>
                     南方科技大学创新创意设计学院 · 韧性文化研究组
                 </div>
             </div>
-            
+
             <img src="assets/iceberg.png" class="footer-iceberg" alt="iceberg">
         </div>
 
@@ -243,32 +305,26 @@
     </div>
 
     <script>
-        // --- 1. 自动生成背景鱼群 ---
         function initFishTank() {
             const tank = document.getElementById('fish-tank');
-            const totalFishImages = 10; 
-            const fishCount = 20; // 同屏同时游动 20 条鱼
+            const totalFishImages = 10;
+            const fishCount = 15; // background fish only, unrelated to certificate fish count
 
             for (let i = 0; i < fishCount; i++) {
                 const fish = document.createElement('img');
-                // 随机选一张鱼的图片
                 const randomImgIndex = Math.floor(Math.random() * totalFishImages) + 1;
                 fish.src = `assets/fish (${randomImgIndex}).png`;
-                
+
                 fish.classList.add('swimming-fish');
-                
-                // 随机大小
+
                 const size = 20 + Math.random() * 120;
                 fish.style.width = `${size}px`;
-                
-                // 随机起始位置（垂直方向）
+
                 fish.style.top = `${Math.random() * 95}%`;
-                
-                // 随机游动速度
+
                 const duration = 18 + Math.random() * 25;
                 fish.style.animationDuration = `${duration}s`;
-                
-                // 随机延迟
+
                 fish.style.animationDelay = `-${Math.random() * 30}s`;
 
                 tank.appendChild(fish);
@@ -276,53 +332,68 @@
         }
         window.onload = initFishTank;
 
-        // --- 2. 证书生成逻辑 ---
-        const CONFIG = { SECRET_CODE: "1234abcd" };
-
-        function generateBadge() {
+        async function generateBadge() {
             const idInput = document.getElementById('userId').value;
             const nameInput = document.getElementById('userName').value.trim();
             const codeInput = document.getElementById('activeCode').value.trim();
             const errorMsg = document.getElementById('error-msg');
             const container = document.getElementById('badge-container');
 
-            if (codeInput !== CONFIG.SECRET_CODE) {
+            if (!codeInput) {
                 errorMsg.style.display = 'block';
-                errorMsg.innerText = "❌ 激活编码错误";
+                errorMsg.innerText = '请输入激活码';
                 container.style.display = 'none';
                 return;
             }
 
-            errorMsg.style.display = 'none';
-            document.getElementById('display-id').innerText = "NO." + idInput;
-            document.getElementById('display-name').innerText = nameInput ? nameInput : "低碳卫士";
+            try {
+                const resp = await fetch('/api/badge/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ familyId: idInput, code: codeInput })
+                });
+                const result = await resp.json();
 
-            container.style.display = 'flex';
-            setTimeout(() => { container.scrollIntoView({ behavior: 'smooth' }); }, 100);
+                if (!resp.ok || !result.ok) {
+                    throw new Error(result.message || '激活码错误');
+                }
+
+                errorMsg.style.display = 'none';
+                document.getElementById('display-id').innerText = 'NO.' + idInput;
+                document.getElementById('display-name').innerText = nameInput ? nameInput : '低碳卫士';
+                document.getElementById('display-fish-count').innerText = result.fishCount;
+
+                container.style.display = 'flex';
+                setTimeout(() => { container.scrollIntoView({ behavior: 'smooth' }); }, 100);
+            } catch (err) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = err.message || '验证失败，请稍后重试';
+                container.style.display = 'none';
+            }
         }
 
         function downloadImage() {
-            const element = document.getElementById("capture-area");
-            // 临时移除阴影和边框，让下载的图片更干净
+            const element = document.getElementById('capture-area');
             const originalBoxShadow = element.style.boxShadow;
             const originalBorder = element.style.border;
+            const originalBorderRadius = element.style.borderRadius;
+
             element.style.boxShadow = 'none';
             element.style.border = 'none';
-            element.style.borderRadius = '0'; // 下载矩形图片
+            element.style.borderRadius = '0';
 
             html2canvas(element, {
-                scale: 4, // 更高清晰度
-                useCORS: true, 
+                scale: 4,
+                useCORS: true,
                 backgroundColor: null
-            }).then(canvas => {
-                // 恢复样式
+            }).then((canvas) => {
                 element.style.boxShadow = originalBoxShadow;
                 element.style.border = originalBorder;
-                element.style.borderRadius = '25px';
+                element.style.borderRadius = originalBorderRadius || '25px';
 
-                const link = document.createElement("a");
-                link.download = "EcoStep-低碳荣誉证书.png";
-                link.href = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                link.download = 'EcoStep-低碳荣誉证书.png';
+                link.href = canvas.toDataURL('image/png');
                 link.click();
             });
         }

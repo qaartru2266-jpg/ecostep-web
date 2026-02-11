@@ -1,0 +1,10 @@
+﻿{
+  "01": { "code": "ecostep001", "fishCount": 10 },
+  "02": { "code": "ecostep002", "fishCount": 10 },
+  "03": { "code": "ecostep003", "fishCount": 10 },
+  "04": { "code": "ecostep004", "fishCount": 10 },
+  "05": { "code": "ecostep005", "fishCount": 10 },
+  "06": { "code": "ecostep006", "fishCount": 10 },
+  "07": { "code": "ecostep007", "fishCount": 10 },
+  "08": { "code": "ecostep008", "fishCount": 10 }
+}
