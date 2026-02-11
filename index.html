@@ -332,7 +332,18 @@
         }
         window.onload = initFishTank;
 
-        async function generateBadge() {
+        const FAMILY_DATA = {
+            "01": { code: "ecostep001", fishCount: 15 },
+            "02": { code: "ecostep002", fishCount: 12 },
+            "03": { code: "ecostep003", fishCount: 18 },
+            "04": { code: "ecostep004", fishCount: 10 },
+            "05": { code: "ecostep005", fishCount: 16 },
+            "06": { code: "ecostep006", fishCount: 9 },
+            "07": { code: "ecostep007", fishCount: 20 },
+            "08": { code: "ecostep008", fishCount: 14 }
+        };
+
+        function generateBadge() {
             const idInput = document.getElementById('userId').value;
             const nameInput = document.getElementById('userName').value.trim();
             const codeInput = document.getElementById('activeCode').value.trim();
@@ -346,30 +357,21 @@
                 return;
             }
 
-            try {
-                const resp = await fetch('/api/badge/verify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ familyId: idInput, code: codeInput })
-                });
-                const result = await resp.json();
-
-                if (!resp.ok || !result.ok) {
-                    throw new Error(result.message || '激活码错误');
-                }
-
-                errorMsg.style.display = 'none';
-                document.getElementById('display-id').innerText = 'NO.' + idInput;
-                document.getElementById('display-name').innerText = nameInput ? nameInput : '低碳卫士';
-                document.getElementById('display-fish-count').innerText = result.fishCount;
-
-                container.style.display = 'flex';
-                setTimeout(() => { container.scrollIntoView({ behavior: 'smooth' }); }, 100);
-            } catch (err) {
+            const familyConfig = FAMILY_DATA[idInput];
+            if (!familyConfig || codeInput !== familyConfig.code) {
                 errorMsg.style.display = 'block';
-                errorMsg.innerText = err.message || '验证失败，请稍后重试';
+                errorMsg.innerText = '激活码错误';
                 container.style.display = 'none';
+                return;
             }
+
+            errorMsg.style.display = 'none';
+            document.getElementById('display-id').innerText = 'NO.' + idInput;
+            document.getElementById('display-name').innerText = nameInput ? nameInput : '低碳卫士';
+            document.getElementById('display-fish-count').innerText = familyConfig.fishCount;
+
+            container.style.display = 'flex';
+            setTimeout(() => { container.scrollIntoView({ behavior: 'smooth' }); }, 100);
         }
 
         function downloadImage() {
